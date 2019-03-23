@@ -406,6 +406,42 @@ class ImportTest(BaseTestCase):
         for node, expected_label in zip(self.cfg.nodes, EXPECTED):
             self.assertEqual(node.label, expected_label)
 
+    def test_from_multiple_files_with_aliases(self):
+        """Make sure that when two functions are imported that have the same name, they are aliased correctly."""
+        file_path = os.path.normpath('examples/import_test_project/test_from_multiple_files_with_aliases.py')
+        project_path = os.path.normpath('examples/import_test_project')
+
+        project_modules = get_modules_and_packages(project_path)
+        local_modules = get_directory_modules(project_path)
+
+        self.cfg_create_from_file(file_path, project_modules, local_modules)
+
+        EXPECTED = ["Entry module",
+                    "Module Entry multiple_files.C",
+                    "Module Exit multiple_files.C",
+                    "Module Entry multiple_files.D",
+                    "Module Exit multiple_files.D",
+                    "temp_1_s = 'from_c'",
+                    "s = temp_1_s",
+                    "Function Entry foo",
+                    "ret_foo_c = s + 'see'",
+                    "Exit foo",
+                    "~call_1 = ret_foo_c",
+                    "c = ~call_1",
+                    "save_2_c = c",
+                    "temp_2_s = 'from_d'",
+                    "s = temp_2_s",
+                    "Function Entry foo",
+                    "ret_foo_d = s + 'dee'",
+                    "Exit foo",
+                    "c = save_2_c",
+                    "~call_2 = ret_foo_d",
+                    "d = ~call_2",
+                    "Exit module"]
+
+        for node, expected_label in zip(self.cfg.nodes, EXPECTED):
+            self.assertEqual(node.label, expected_label)
+
     def test_multiple_functions_with_aliases(self):
         file_path = os.path.normpath('examples/import_test_project/test_multiple_functions_with_aliases.py')
         project_path = os.path.normpath('examples/import_test_project')
